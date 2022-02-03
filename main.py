@@ -48,8 +48,6 @@ def player_animation():
         player_surf = player_walk[int(player_index)]
 
 
-
-
 pygame.init()  # initiation pygame
 window = pygame.display.set_mode((800, 400))
 pygame.display.set_caption("Runner")  # title of the window
@@ -65,11 +63,21 @@ sky_surf = pygame.image.load("images/Sky.png").convert()  # convert is for our g
 ground_surf = pygame.image.load("images/ground.png").convert()
 
 # Obstacles
-snail_surf = pygame.image.load("images/snail/snail1.png").convert_alpha()
-fly_surf = pygame.image.load("images/Fly/Fly1.png").convert_alpha()
+snail_frame1 = pygame.image.load("images/snail/snail1.png").convert_alpha()
+snail_frame2 = pygame.image.load("images/snail/snail2.png").convert_alpha()
+snail_frames = [snail_frame1, snail_frame2]
+snail_frame_index = 0
+snail_surf = snail_frames[snail_frame_index]
+
+fly_frame1 = pygame.image.load("images/Fly/Fly1.png").convert_alpha()
+fly_frame2 = pygame.image.load("images/Fly/Fly2.png").convert_alpha()
+fly_frames = [fly_frame1, fly_frame2]
+fly_frame_index = 0
+fly_surf = fly_frames[fly_frame_index]
 
 obstacle_rect_list = []
 
+# Player
 player_walk1 = pygame.image.load("images/player/player_walk_1.png").convert_alpha()
 player_walk2 = pygame.image.load("images/player/player_walk_2.png").convert_alpha()
 player_walk = [player_walk1, player_walk2]
@@ -92,6 +100,12 @@ game_message_rect = game_message.get_rect(center=(400, 330))
 # Timer
 obstacle_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(obstacle_timer, 1400)
+
+snail_animation_timer = pygame.USEREVENT + 2
+pygame.time.set_timer(snail_animation_timer, 500)
+
+fly_animation_timer = pygame.USEREVENT + 3
+pygame.time.set_timer(fly_animation_timer, 200)
 
 gravity = 0
 
@@ -116,6 +130,18 @@ while True:
                     obstacle_rect_list.append(snail_surf.get_rect(bottomright=(randint(900, 1100), 300)))
                 else:
                     obstacle_rect_list.append(fly_surf.get_rect(bottomright=(randint(900, 1100), 210)))
+            if event.type == snail_animation_timer:
+                if snail_frame_index == 0:
+                    snail_frame_index = 1
+                else:
+                    snail_frame_index = 0
+                snail_surf = snail_frames[snail_frame_index]
+            if event.type == fly_animation_timer:
+                if fly_frame_index == 0:
+                    fly_frame_index = 1
+                else:
+                    fly_frame_index = 0
+                fly_surf = fly_frames[fly_frame_index]
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_active = True
