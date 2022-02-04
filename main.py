@@ -3,6 +3,44 @@ from sys import exit
 from random import randint
 
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        player_walk1 = pygame.image.load("images/player/player_walk_1.png").convert_alpha()
+        player_walk2 = pygame.image.load("images/player/player_walk_2.png").convert_alpha()
+        self.player_walk = [player_walk1, player_walk2]
+        self.player_index = 0
+        self.player_jump = pygame.image.load("images/player/jump.png").convert_alpha()
+        self.image = self.player_walk[self.player_index]
+        self.rect = self.image.get_rect(midbottom=(200, 300))
+        self.gravity = 0
+
+    def player_input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and self.rect.bottom >= 300:
+            self.gravity = -20
+
+    def apply_gravity(self):
+        self.gravity += 1
+        self.rect.y += self.gravity
+        if self.rect.bottom >= 300:
+            self.rect.bottom = 300
+
+    def animation(self):
+        if self.rect.bottom < 300:
+            self.image = self.player_jump
+        else:
+            self.player_index += 0.1
+            if self.player_index >= len(self.player_walk):
+                self.player_index = 0
+            self.image = self.player_walk[int(self.player_index)]
+
+    def update(self):
+        self.player_input()
+        self.apply_gravity()
+        self.animation()
+
+    
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
     score_surf = font.render(f'Score: {current_time}', False, (64, 64, 64))
@@ -78,6 +116,9 @@ fly_surf = fly_frames[fly_frame_index]
 obstacle_rect_list = []
 
 # Player
+player = pygame.sprite.GroupSingle()    # Create group
+player.add(Player())            # which contains sprite
+
 player_walk1 = pygame.image.load("images/player/player_walk_1.png").convert_alpha()
 player_walk2 = pygame.image.load("images/player/player_walk_2.png").convert_alpha()
 player_walk = [player_walk1, player_walk2]
@@ -159,6 +200,8 @@ while True:
             player_rect.bottom = 300
         player_animation()
         window.blit(player_surf, player_rect)
+        player.draw(window)
+        player.update()
 
         # Obstacle movement
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
